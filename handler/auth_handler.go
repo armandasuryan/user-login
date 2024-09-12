@@ -1,26 +1,26 @@
 package handler
 
 import (
-	"user-service/backend/middleware"
-	"user-service/backend/model"
-	"user-service/backend/services"
-	"user-service/backend/utils"
+	"auth/backend/middleware"
+	"auth/backend/model"
+	"auth/backend/services"
+	"auth/backend/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 )
 
-type UserHandlerMethod struct {
-	service *services.UserServiceMethod
+type AuthHandlerMethod struct {
+	service *services.AuthServiceMethod
 	log     *logrus.Logger
 }
 
-func UserHandler(service *services.UserServiceMethod, log *logrus.Logger) *UserHandlerMethod {
-	return &UserHandlerMethod{service, log}
+func AuthHandler(service *services.AuthServiceMethod, log *logrus.Logger) *AuthHandlerMethod {
+	return &AuthHandlerMethod{service, log}
 }
 
-func (h *UserHandlerMethod) LoginUserHdlr(c *fiber.Ctx) error {
-	h.log.Println("Execute function LoginUserHdlr")
+func (h *AuthHandlerMethod) LoginHdlr(c *fiber.Ctx) error {
+	h.log.Println("Execute function LoginHdlr")
 
 	var payloadLogin model.Login
 	if err := c.BodyParser(&payloadLogin); err != nil {
@@ -35,7 +35,7 @@ func (h *UserHandlerMethod) LoginUserHdlr(c *fiber.Ctx) error {
 	// validate data
 	errorFields, validationError := middleware.ValidateData(&payloadLogin)
 	if validationError != nil {
-		h.log.Println("Validation error in LoginUserHdlr:", validationError)
+		h.log.Println("Validation error in LoginHdlr:", validationError)
 		return c.Status(400).JSON(utils.ResponseValidator{
 			StatusCode: 400,
 			Message:    "Fill The Required Fields",
@@ -43,9 +43,9 @@ func (h *UserHandlerMethod) LoginUserHdlr(c *fiber.Ctx) error {
 		})
 	}
 
-	loginData, err := h.service.LoginUserSvc(payloadLogin)
+	loginData, err := h.service.LoginSvc(payloadLogin)
 	if err != nil {
-		h.log.Println("Failed save data in LoginUserHdlr")
+		h.log.Println("Failed save data in LoginHdlr")
 		return c.Status(404).JSON(utils.ResponseData{
 			StatusCode: 404,
 			Message:    "Error login",
@@ -61,7 +61,7 @@ func (h *UserHandlerMethod) LoginUserHdlr(c *fiber.Ctx) error {
 
 }
 
-func (h *UserHandlerMethod) VerifyOTPHdlr(c *fiber.Ctx) error {
+func (h *AuthHandlerMethod) VerifyOTPHdlr(c *fiber.Ctx) error {
 	h.log.Println("Execute function VerifyOTPHdlr")
 
 	var payloadVerify model.VerifyOTP

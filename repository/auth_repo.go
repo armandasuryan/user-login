@@ -1,23 +1,23 @@
 package repository
 
 import (
-	"user-service/backend/model"
-	"user-service/backend/utils"
+	"auth/backend/model"
+	"auth/backend/utils"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
-type UserRepoMethod struct {
+type AuthRepoMethod struct {
 	db  *gorm.DB
 	log *logrus.Logger
 }
 
-func UserRepo(db *gorm.DB, log *logrus.Logger) *UserRepoMethod {
-	return &UserRepoMethod{db, log}
+func AuthRepo(db *gorm.DB, log *logrus.Logger) *AuthRepoMethod {
+	return &AuthRepoMethod{db, log}
 }
 
-func (r *UserRepoMethod) GetDataUserRepo(username string) (model.ResponseLogin, error) {
+func (r *AuthRepoMethod) GetDataUserRepo(username string) (model.ResponseLogin, error) {
 	r.log.Println("Execute function GetDataUserRepo")
 
 	var user model.ResponseLogin

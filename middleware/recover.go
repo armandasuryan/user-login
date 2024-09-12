@@ -1,10 +1,10 @@
 package middleware
 
 import (
+	response "auth/backend/utils"
 	"fmt"
 	"log"
 	"runtime/debug"
-	response "user-service/backend/utils"
 
 	"github.com/gofiber/fiber/v2"
 )

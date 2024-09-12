@@ -1,13 +1,13 @@
 package apps
 
 import (
+	db "auth/backend/config"
+	"auth/backend/handler"
+	"auth/backend/middleware"
+	"auth/backend/repository"
+	"auth/backend/routes"
+	"auth/backend/services"
 	"os"
-	db "user-service/backend/config"
-	"user-service/backend/handler"
-	"user-service/backend/middleware"
-	"user-service/backend/repository"
-	"user-service/backend/routes"
-	"user-service/backend/services"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -60,12 +60,12 @@ func StartApps() {
 	// setup db
 	mysql := setupMySQLConnection()
 
-	userSetting := setupUser(mysql, log)
-	userRouteConfig := routes.UserRoute{
+	authSetting := setupAuth(mysql, log)
+	authRouteConfig := routes.AuthRoute{
 		App:         app,
-		UserHandler: userSetting,
+		AuthHandler: authSetting,
 	}
-	userRouteConfig.SetupUserRoute()
+	authRouteConfig.SetupAuthRoute()
 
 	errApp := app.Listen(":8080")
 	if errApp != nil {
@@ -82,8 +82,8 @@ func setupMySQLConnection() *gorm.DB {
 	return db.MysqlConnect(hostMysql, usernameMysql, passwordMysql, dbMysql)
 }
 
-func setupUser(mysql *gorm.DB, log *logrus.Logger) *handler.UserHandlerMethod {
-	repo := repository.UserRepo(mysql, log)
-	svc := services.UserService(repo, log)
-	return handler.UserHandler(svc, log)
+func setupAuth(mysql *gorm.DB, log *logrus.Logger) *handler.AuthHandlerMethod {
+	repo := repository.AuthRepo(mysql, log)
+	svc := services.AuthService(repo, log)
+	return handler.AuthHandler(svc, log)
 }

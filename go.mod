@@ -1,4 +1,4 @@
-module user-service/backend
+module auth/backend
 
 go 1.22.0
 
