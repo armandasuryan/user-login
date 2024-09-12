@@ -21,13 +21,12 @@ func (r *AuthRepoMethod) GetDataUserRepo(username string) (model.ResponseLogin, 
 	r.log.Println("Execute function GetDataUserRepo")
 
 	var user model.ResponseLogin
-	err := r.db.Table(utils.TABEL_USER).
+	if err := r.db.Table(utils.TABEL_USER).
 		Select(`user.id, user.username, emp.name, emp.email, role.role_name`).
-		Joins(`LEFT JOIN employee emp ON user.id_employee = emp.id`).
-		Joins(`LEFT JOIN role ON role.id = emp.id_role`).
+		Joins(`employee emp ON user.id_employee = emp.id`).
+		Joins(`role ON role.id = emp.id_role`).
 		Where("user.deleted_at IS NULL").
-		Find(&user).Error
-	if err != nil {
+		Find(&user).Error; err != nil {
 		r.log.Error("Failed to get detail data user :", err)
 		return model.ResponseLogin{}, err
 	}
