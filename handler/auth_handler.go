@@ -44,12 +44,12 @@ func (h *AuthHandlerMethod) LoginHdlr(c *fiber.Ctx) error {
 	}
 
 	loginData, err := h.service.LoginSvc(payloadLogin)
-	if err != nil {
-		h.log.Println("Failed save data in LoginHdlr")
-		return c.Status(404).JSON(utils.ResponseData{
-			StatusCode: 404,
-			Message:    "Error login",
-			Error:      err.Error(),
+	if err != "" {
+		h.log.Println("Failed get data in LoginHdlr")
+		return c.Status(401).JSON(utils.ResponseData{
+			StatusCode: 401,
+			Message:    err,
+			Error:      "Error login",
 		})
 	}
 

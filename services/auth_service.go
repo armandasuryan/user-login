@@ -16,13 +16,14 @@ func AuthService(repo *repository.AuthRepoMethod, log *logrus.Logger) *AuthServi
 	return &AuthServiceMethod{repo, log}
 }
 
-func (s *AuthServiceMethod) LoginSvc(payload model.Login) (model.OTP, error) {
+func (s *AuthServiceMethod) LoginSvc(payload model.Login) (model.OTP, string) {
 
 	var response model.OTP
+	verifyData := s.repo.VerifyDataUserRepo(payload.Username, payload.Password)
 
-	return response, nil
+	return response, verifyData
 }
 
 func (s *AuthServiceMethod) VerifyOTPSvc(payload model.VerifyOTP) (model.ResponseLogin, error) {
-	return s.repo.GetDataUserRepo(payload.UserName)
+	return s.repo.GetDataUserRepo(payload.Username)
 }
