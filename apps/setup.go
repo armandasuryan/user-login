@@ -1,14 +1,17 @@
 package apps
 
 import (
-	db "auth/backend/config"
+	"auth/backend/config/db"
+	rds "auth/backend/config/redis"
 	"auth/backend/handler"
 	"auth/backend/middleware"
 	"auth/backend/repository"
 	"auth/backend/routes"
 	"auth/backend/services"
 	"os"
+	"strconv"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -57,8 +60,9 @@ func StartApps() {
 		log.Fatal("Error loading .env file")
 	}
 
-	// setup db
+	// setup db, redis
 	mysql := setupMySQLConnection()
+	// redis := setupRedisConnection()
 
 	authSetting := setupAuth(mysql, log)
 	authRouteConfig := routes.AuthRoute{
@@ -80,6 +84,15 @@ func setupMySQLConnection() *gorm.DB {
 	dbMysql := os.Getenv("DB_NAME")
 
 	return db.MysqlConnect(hostMysql, usernameMysql, passwordMysql, dbMysql)
+}
+
+func setupRedisConnection() *redis.Client {
+	hostRedis := os.Getenv("REDIS_HOST")
+	passwordRedis := os.Getenv("REDIS_PASSWORD")
+	dbRedis, _ := strconv.Atoi(os.Getenv("REDIS_DB"))
+
+	return rds.RedisConnect(hostRedis, passwordRedis, dbRedis)
+
 }
 
 func setupAuth(mysql *gorm.DB, log *logrus.Logger) *handler.AuthHandlerMethod {
