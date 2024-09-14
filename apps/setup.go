@@ -62,9 +62,9 @@ func StartApps() {
 
 	// setup db, redis
 	mysql := setupMySQLConnection()
-	// redis := setupRedisConnection()
+	redis := setupRedisConnection()
 
-	authSetting := setupAuth(mysql, log)
+	authSetting := setupAuth(mysql, redis, log)
 	authRouteConfig := routes.AuthRoute{
 		App:         app,
 		AuthHandler: authSetting,
@@ -95,8 +95,8 @@ func setupRedisConnection() *redis.Client {
 
 }
 
-func setupAuth(mysql *gorm.DB, log *logrus.Logger) *handler.AuthHandlerMethod {
+func setupAuth(mysql *gorm.DB, redis *redis.Client, log *logrus.Logger) *handler.AuthHandlerMethod {
 	repo := repository.AuthRepo(mysql, log)
-	svc := services.AuthService(repo, log)
+	svc := services.AuthService(repo, redis, log)
 	return handler.AuthHandler(svc, log)
 }
