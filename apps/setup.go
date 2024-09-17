@@ -8,6 +8,7 @@ import (
 	"auth/backend/repository"
 	"auth/backend/routes"
 	"auth/backend/services"
+	"fmt"
 	"os"
 	"strconv"
 
@@ -87,7 +88,7 @@ func setupMySQLConnection() *gorm.DB {
 }
 
 func setupRedisConnection() *redis.Client {
-	hostRedis := os.Getenv("REDIS_HOST")
+	hostRedis := fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT"))
 	passwordRedis := os.Getenv("REDIS_PASSWORD")
 	dbRedis, _ := strconv.Atoi(os.Getenv("REDIS_DB"))
 
