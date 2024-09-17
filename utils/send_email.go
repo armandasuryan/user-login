@@ -1,19 +1,14 @@
 package utils
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 
-	"github.com/sirupsen/logrus"
 	"gopkg.in/gomail.v2"
 )
 
-type SentMail struct {
-	log *logrus.Logger
-}
-
-func (s *SentMail) sentEmail(headerFrom string, headerTo string, subject string, body string) error {
-	s.log.Println("Execute function sent email")
+func SentEmail(headerFrom string, headerTo string, subject string, body string) error {
 
 	m := gomail.NewMessage()
 	m.SetHeader("From", headerFrom)
@@ -25,16 +20,16 @@ func (s *SentMail) sentEmail(headerFrom string, headerTo string, subject string,
 	host := os.Getenv("SMTP_HOST")
 	port, _ := strconv.Atoi(os.Getenv("SMTP_PORT"))
 	user := os.Getenv("SMTP_USER")
-	passwd := os.Getenv("SMTP_PASSWORD")
+	passwd := os.Getenv("SMTP_PASS")
 
 	configEmail := gomail.NewDialer(host, port, user, passwd)
 
 	if err := configEmail.DialAndSend(m); err != nil {
-		s.log.Error("Failed to sent email")
+		fmt.Printf("Failed to sent email : %s", err)
 		return err
 	}
 
-	s.log.Println("Email sent successfully!")
+	fmt.Println("Email sent successfully!")
 
 	return nil
 }

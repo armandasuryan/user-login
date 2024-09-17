@@ -1,10 +1,14 @@
 package services
 
 import (
+	"auth/backend/middleware"
 	"auth/backend/model"
 	"auth/backend/repository"
+	"auth/backend/utils"
 	"context"
 	"crypto/rand"
+	"fmt"
+	"os"
 	"strconv"
 	"time"
 
@@ -29,34 +33,51 @@ func (s *AuthServiceMethod) LoginSvc(payload model.Login) (model.OTP, string) {
 	verifyData := s.repo.VerifyDataUserRepo(payload.Username, payload.Password)
 
 	response.OTP, _ = s.GenerateOTPCode(6)
-	err := s.redis.Set(context.TODO(), payload.Username+"_otp", response.OTP, time.Minute*5).Err() // time 5 minutes
+	duration := time.Minute * 5
+	err := s.redis.Set(context.TODO(), payload.Username+"_otp", response.OTP, duration).Err()
 	if err != nil {
 		s.log.Error("Failed to store OTP in Redis:", err)
 	}
 
+	timeLeft := duration.Seconds()
+	minutes := int(timeLeft) / 60
+	seconds := int(timeLeft) % 60
+
+	response.TimeLeft = fmt.Sprintf("%02d:%02d", minutes, seconds)
+
+	// send otp to email
+	from := os.Getenv("SMTP_USER")
+	to := payload.Username
+	subject := "OTP Code"
+	body := fmt.Sprintf("Your OTP Code is : %v", response.OTP)
+
+	// send email using go routine
+	go utils.SentEmail(from, to, subject, body)
 	return response, verifyData
 }
 
-func (s *AuthServiceMethod) VerifyOTPSvc(payload model.VerifyOTP) (model.ResponseLogin, error) {
+func (s *AuthServiceMethod) VerifyOTPSvc(payload model.VerifyOTP) (model.ResponseLogin, string) {
 	s.log.Println("Execute function VerifyOTPSvc")
 
 	storedOTP, err := s.redis.Get(context.TODO(), payload.Username+"_otp").Result()
 	if err == redis.Nil {
 		s.log.Error("OTP not found or expired")
-		return model.ResponseLogin{}, err
+		return model.ResponseLogin{}, "OTP not found or expired"
 	} else if err != nil {
 		s.log.Error("Error getting OTP from Redis:", err)
-		return model.ResponseLogin{}, err
+		errMsg := fmt.Sprintf("Error getting OTP from Redis : %s", err)
+		return model.ResponseLogin{}, errMsg
 	}
 
 	storedOTPInt, _ := strconv.Atoi(storedOTP)
-
 	if storedOTPInt != payload.OTPCode {
 		s.log.Error("Invalid OTP")
-		return model.ResponseLogin{}, err
+		return model.ResponseLogin{}, "Invalid OTP"
 	}
 
-	return s.repo.GetDataUserRepo(payload.Username)
+	result, _ := s.repo.GetDataUserRepo(payload.Username)
+	result.Token, _ = middleware.CreateJwt(result)
+	return result, ""
 }
 
 func (s *AuthServiceMethod) GenerateOTPCode(maxDigit int) (int, error) {

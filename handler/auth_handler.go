@@ -86,12 +86,12 @@ func (h *AuthHandlerMethod) VerifyOTPHdlr(c *fiber.Ctx) error {
 	}
 
 	verifyOTP, err := h.service.VerifyOTPSvc(payloadVerify)
-	if err != nil {
+	if err != "" {
 		h.log.Println("Failed verify data in VerifyOTPHdlr")
 		return c.Status(401).JSON(utils.ResponseData{
 			StatusCode: 401,
-			Message:    "Error verify OTP",
-			Error:      err.Error(),
+			Message:    err,
+			Error:      "Error verify OTP",
 		})
 	}
 
