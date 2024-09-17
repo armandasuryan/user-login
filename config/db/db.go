@@ -3,6 +3,7 @@ package db
 import (
 	"fmt"
 
+	"github.com/common-nighthawk/go-figure"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -22,7 +23,8 @@ func MysqlConnect(host string, username string, password string, db_name string)
 	if err != nil {
 		fmt.Println("Failed to connect to the database")
 	} else {
-		fmt.Println("Connect Mysql")
+		connectFigure := figure.NewColorFigure("Connect to Mysql", "", "yellow", true)
+		connectFigure.Print()
 	}
 
 	return db
@@ -42,7 +44,8 @@ func MysqlConnect(host string, username string, password string, db_name string)
 // 	if err != nil {
 // 		fmt.Println("Failed to connect to the database")
 // 	} else {
-// 		fmt.Println("Connected to PostgreSQL")
+// 		connectFigure := figure.NewColorFigure("Connect to PostgreSQL", "", "green", true)
+//      connectFigure.Print()
 // 	}
 
 // 	return db
