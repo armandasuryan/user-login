@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  backend:
+  backend_go:
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,7 +9,7 @@ services:
       - .:/app
       - filestorage:/tmp
     env_file:
-      - ./.env
+      - .env
     ports:
       - "8080:8080"
     networks:
@@ -32,7 +32,7 @@ services:
 
   redis:
     image: redis:7
-    hostname: redis_go
+    hostname: ${REDIS_HOST}
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
     command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
