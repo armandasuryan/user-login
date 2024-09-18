@@ -29,6 +29,7 @@ db/*
 # docker
 # Dockerfile
 # docker-compose.yml
+build-errors.log
 
 .air.toml
 tmp/
