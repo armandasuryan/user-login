@@ -2,6 +2,7 @@ package routes
 
 import (
 	"auth/backend/handler"
+	"auth/backend/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -16,4 +17,5 @@ func (r *AuthRoute) SetupAuthRoute() {
 
 	authRoute.Post("/login", r.AuthHandler.LoginHdlr)
 	authRoute.Post("/login/verify-otp", r.AuthHandler.VerifyOTPHdlr)
+	authRoute.Get("/user-profile", middleware.JWTMiddleware, r.AuthHandler.GetUserProfileHdlr)
 }
