@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"auth/backend/middleware"
 	"auth/backend/model"
 	"auth/backend/services"
 	"auth/backend/utils"
@@ -33,7 +32,7 @@ func (h *AuthHandlerMethod) LoginHdlr(c *fiber.Ctx) error {
 	}
 
 	// validate data
-	errorFields, validationError := middleware.ValidateData(&payloadLogin)
+	errorFields, validationError := utils.ValidateData(&payloadLogin)
 	if validationError != nil {
 		h.log.Println("Validation error in LoginHdlr:", validationError)
 		return c.Status(400).JSON(utils.ResponseValidator{
@@ -75,7 +74,7 @@ func (h *AuthHandlerMethod) VerifyOTPHdlr(c *fiber.Ctx) error {
 	}
 
 	// validate data
-	errorFields, validationError := middleware.ValidateData(&payloadVerify)
+	errorFields, validationError := utils.ValidateData(&payloadVerify)
 	if validationError != nil {
 		h.log.Println("Validation error in VerifyOTPHdlr:", validationError)
 		return c.Status(400).JSON(utils.ResponseValidator{
