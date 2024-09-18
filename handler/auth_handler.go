@@ -101,3 +101,23 @@ func (h *AuthHandlerMethod) VerifyOTPHdlr(c *fiber.Ctx) error {
 		Data:       verifyOTP,
 	})
 }
+
+func (h *AuthHandlerMethod) GetUserProfileHdlr(c *fiber.Ctx) error {
+	h.log.Println("Execute function GetUserProfileHdlr")
+
+	getUserProfile, err := h.service.GetUserProfileSvc(c)
+	if err != nil {
+		h.log.Println("Failed get user profile")
+		return c.Status(401).JSON(utils.ResponseData{
+			StatusCode: 401,
+			Message:    "Failed get user profile",
+			Error:      err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(utils.ResponseData{
+		StatusCode: 200,
+		Message:    "Successfully get user profile",
+		Data:       getUserProfile,
+	})
+}
