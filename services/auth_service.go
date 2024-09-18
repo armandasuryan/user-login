@@ -13,6 +13,8 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/sirupsen/logrus"
 )
 
@@ -31,6 +33,7 @@ func (s *AuthServiceMethod) LoginSvc(payload model.Login) (model.OTP, string) {
 
 	var response model.OTP
 	verifyData := s.repo.VerifyDataUserRepo(payload.Username, payload.Password)
+	dataUser, _ := s.repo.GetDataUserRepo(payload.Username)
 
 	response.OTP, _ = s.GenerateOTPCode(6)
 	duration := time.Minute * 5
@@ -46,13 +49,16 @@ func (s *AuthServiceMethod) LoginSvc(payload model.Login) (model.OTP, string) {
 	response.TimeLeft = fmt.Sprintf("%02d:%02d", minutes, seconds)
 
 	// send otp to email
-	from := os.Getenv("SMTP_USER")
-	to := payload.Username
-	subject := "OTP Code"
-	body := fmt.Sprintf("Your OTP Code is : %v", response.OTP)
+	if verifyData == "" {
+		from := os.Getenv("SMTP_USER")
+		to := dataUser.Email
+		subject := "OTP Code"
+		body := fmt.Sprintf("Your OTP Code is : %v", response.OTP)
 
-	// send email using go routine
-	go utils.SentEmail(from, to, subject, body)
+		// send email using go routine
+		go utils.SentEmail(from, to, subject, body)
+	}
+
 	return response, verifyData
 }
 
@@ -95,4 +101,12 @@ func (s *AuthServiceMethod) GenerateOTPCode(maxDigit int) (int, error) {
 
 	result, _ := strconv.Atoi(string(codes))
 	return result, nil
+}
+
+func (s *AuthServiceMethod) GetUserProfileSvc(c *fiber.Ctx) (model.UserProfile, error) {
+	s.log.Println("Execute function GetUserProfileSvc")
+
+	token := c.Locals("token").(jwt.MapClaims)
+	username := token["username"]
+	return s.repo.GetUserProfile(username.(string))
 }
