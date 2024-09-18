@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"auth/backend/middleware"
 	"auth/backend/model"
 	"auth/backend/utils"
 	"errors"
@@ -53,7 +52,7 @@ func (r *AuthRepoMethod) VerifyDataUserRepo(username, passwd string) string {
 	}
 
 	// verify password
-	if !middleware.VerifyPassword(passwd, login.Password) {
+	if !utils.VerifyPassword(passwd, login.Password) {
 		r.log.Error("Password dosn't match")
 		return "Password dosn't match"
 	}
