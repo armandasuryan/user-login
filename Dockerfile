@@ -1,35 +1,32 @@
 # syntax=docker/dockerfile:1
 
-# Mengatur versi Go
+# setting go version
 ARG GO_VERSION=1.23
 
-# Menggunakan Go dengan alpine sebagai base image
+# using go and alpine for image
 FROM golang:${GO_VERSION}-alpine
 
-# Mengatur mode production secara default
+# set default production mode
 ENV GO_ENV production
 
-# Menentukan direktori kerja untuk aplikasi
+# set directory 
 WORKDIR /usr/src/app
 
-# Copy go.mod dan go.sum agar dependency dapat di-cache
 COPY go.mod go.sum ./
 
-# Menggunakan cache mount untuk mempercepat build selanjutnya
 RUN --mount=type=cache,target=/go/pkg/mod \
     go mod download
 
-# Copy seluruh aplikasi ke container
 COPY . .
 
-# Build aplikasi Go
+# build application
 RUN go build -o app ./cmd/main.go
 
-# Menggunakan user non-root untuk menjalankan aplikasi
+# using user non root for run the apps
 USER nobody
 
-# Mengekspos port aplikasi (sesuai aplikasi Go kamu)
+# expose port
 EXPOSE 8080
 
-# Menjalankan aplikasi
+# run apps
 CMD ["./app"]
