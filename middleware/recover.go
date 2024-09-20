@@ -19,7 +19,7 @@ func CustomRecoverMiddleware(c *fiber.Ctx) error {
 			// trace detail error go runtime
 			stackTrace := debug.Stack()
 			log.Printf("Panic problem: %v", string(stackTrace))
-			c.Status(500).JSON(response.ResponseMeta{
+			c.Status(500).JSON(response.StandardResponse{
 				StatusCode: 500,
 				Message:    "Error panic",
 				Error:      panicMessage,

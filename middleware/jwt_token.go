@@ -35,7 +35,7 @@ func JWTMiddleware(c *fiber.Ctx) error {
 
 	tokenString := c.Get("Authorization")
 	if tokenString == "" {
-		return c.Status(401).JSON(utils.ResponseData{
+		return c.Status(401).JSON(utils.ErrorResponse{
 			StatusCode: 401,
 			Message:    "Authorization header not provided",
 			Error:      "Error get header authorization",
@@ -44,7 +44,7 @@ func JWTMiddleware(c *fiber.Ctx) error {
 
 	jwtData, err := VerifyJWTToken(tokenString)
 	if err != "" {
-		return c.Status(401).JSON(utils.ResponseData{
+		return c.Status(401).JSON(utils.ErrorResponse{
 			StatusCode: 401,
 			Message:    err,
 			Error:      "error verify token",
