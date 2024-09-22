@@ -106,6 +106,15 @@ func (h *AuthHandlerMethod) GetUserProfileHdlr(c *fiber.Ctx) error {
 
 	getUserProfile, err := h.service.GetUserProfileSvc(c)
 	if err != nil {
+		if err.Error() == "record not found" {
+			h.log.Println("User profile not found")
+			return c.Status(404).JSON(utils.ErrorResponse{
+				StatusCode: 404,
+				Message:    "User profile not found",
+				Error:      err.Error(),
+			})
+		}
+
 		h.log.Println("Failed get user profile")
 		return c.Status(400).JSON(utils.ErrorResponse{
 			StatusCode: 400,
